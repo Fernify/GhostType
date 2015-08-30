@@ -2,30 +2,55 @@
 	$.fn.GhostType = function(options){
 		var settings = $.extend({
 			wordArray: ["Lorem Ipsum", "Foo bar", "Ghost Type"],
-			timeInterval: 200,
-			showWordTime: 4,
+			timeInterval: 100,
+			showWordTime: 3,
 			hideWordTime: 1,
-			startMode: 4
+			startMode: 4,
+			cursor: true,
+			cursorChar: "|",
+			cursorTime: 0.5,
+			stutterType: false
 		}, options);
 
 		return this.each(function(){
 			var mode = settings.startMode;
-			var showTimeInterval = settings.showWordTime/(settings.timeInterval/1000);
-			var hideTimeInterval = settings.hideWordTime/(settings.timeInterval/1000);
+			var showTimeInterval = (settings.showWordTime*1000)/settings.timeInterval;
+			var hideTimeInterval = (settings.hideWordTime*1000)/settings.timeInterval;
+			var cursorInterval = (settings.cursorTime*1000)/settings.timeInterval;
+			var keyWords = settings.wordArray;
+			var cursorShow = settings.cursor;
 			var intervalCount = 0;
 			var wordIndex = 0;
 			var letterIndex = 0;
-			var keyWords = settings.wordArray;
+			var cursorCount = 0;
+			var stutterWrite = settings.stutterType;
+			$(this).append("<span id=\"gtText\"></span>");
+			if(cursorShow){
+				$(this).append("<span id=\"gtCursor\">" + settings.cursorChar + "</span>");
+			}
 
 			setInterval($.proxy(ghoster, this), settings.timeInterval);
 
 			function ghoster(){
-				var inWord=$(this).text();
+				var inWord=$("#gtText").text();
 				var currWord=keyWords[wordIndex];
 				var inWordLength=inWord.length;
+				if(cursorShow){
+					cursorCount++;
+					if(cursorCount==cursorInterval){
+						if($("#gtCursor").is(":visible")){
+							$("#gtCursor").hide();
+						}else{
+							$("#gtCursor").show();
+						}
+						cursorCount = 0;
+					}
+				}
 				if(mode==1){
+					var doAction = true;
+					
 					letterIndex++;
-					$(this).text(currWord.substring(0,letterIndex));
+					$("#gtText").text(currWord.substring(0,letterIndex));
 					if(letterIndex==currWord.length){
 						mode++;
 						letterIndex=inWordLength+1;
@@ -44,7 +69,7 @@
 				}
 				else if(mode==3){
 					letterIndex--;
-					$(this).text(inWord.substring(0,letterIndex));
+					$("#gtText").text(inWord.substring(0,letterIndex));
 					if(letterIndex==0){
 						mode++;
 					}
