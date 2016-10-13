@@ -9,8 +9,9 @@
             cursor: true,
             cursorChar: "|",
             cursorTime: 0.5,
-            stutterType: false,
-            stutterProbability: 0
+            stutter: false,
+            stutterProbability: 0.5,
+            stutterErase: false
         }, options);
 
         return this.each(function () {
@@ -24,7 +25,8 @@
             var wordIndex = 0;
             var letterIndex = 0;
             var cursorCount = 0;
-            var stutterWrite = settings.stutterType;
+            var stutterWrite = settings.stutter;
+            var stutterErase = settings.stutterErase;
             var stutterProbability = settings.stutterProbability;
             $(this).append("<span id=\"gtText\"></span>");
             if (cursorShow) {
@@ -38,6 +40,7 @@
                 var currWord = keyWords[wordIndex];
                 var inWordLength = inWord.length;
                 var stutter = (stutterWrite && !(Math.random() < stutterProbability) || !stutterWrite);
+                var stutterOnClear = (stutterErase && !(Math.random() < stutterProbability) || !stutterErase);
                 if (cursorShow) {
                     cursorCount++;
                     if (cursorCount == cursorInterval) {
@@ -68,7 +71,7 @@
                         intervalCount = 0;
                     }
                 }
-                else if (mode == 3) {
+                else if (mode == 3 && stutterOnClear) {
                     letterIndex--;
                     $("#gtText").text(inWord.substring(0, letterIndex));
                     if (letterIndex == 0) {

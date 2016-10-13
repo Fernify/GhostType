@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>GhostType</title>
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="ghostType.js"></script>
+</head>
+<body>
+    <div style="width:90%; max-width: 500px; font-size: 70px;">
+        <span id="words"></span>
+    </div>
+    <script>
+        $(function () {
+            $("#words").GhostType({
+                wordArray: ["Demo text print", "Next print test", "Third", "Final text output"],
+                stutter: true,
+                stutterProbability: 0.8,
+                stutterErase: true
+            });
+        });
+    </script>
+</body>
+</html>
