@@ -1,60 +1,65 @@
 (function ($) {
     $.fn.GhostType = function (options) {
         var settings = $.extend({
-            wordArray: ["Lorem Ipsum", "Foo bar", "Ghost Type"],
-            timeInterval: 100,
+            words: ["Daniel Fernandez", "a Web Developer", "Fernify"],
             showWordTime: 3,
             hideWordTime: 1,
-            startMode: 4,
             cursor: true,
             cursorChar: "|",
             cursorTime: 0.5,
             stutter: false,
-            stutterProbability: 0.5,
-            stutterErase: false
+            stutterErase: false,
+            stutterProbability: 0.5
         }, options);
 
         return this.each(function () {
-            var mode = settings.startMode;
-            var showTimeInterval = (settings.showWordTime * 1000) / settings.timeInterval;
-            var hideTimeInterval = (settings.hideWordTime * 1000) / settings.timeInterval;
-            var cursorInterval = (settings.cursorTime * 1000) / settings.timeInterval;
-            var keyWords = settings.wordArray;
+            var timeInterval = 100;
+            var showTimeInterval = (settings.showWordTime * 1000) / timeInterval;
+            var hideTimeInterval = (settings.hideWordTime * 1000) / timeInterval;
+            var cursorInterval = (settings.cursorTime * 1000) / timeInterval;
+            var keyWords = settings.words;
             var cursorShow = settings.cursor;
+            var stutterWrite = settings.stutter;
+            var stutterErase = settings.stutterErase;
+            var stutterProbability = settings.stutterProbability;
+
+            $(this).append("<span id=\"gttext\"></span>");
+            if (cursorShow) {
+                $(this).append("<span id=\"gtcursor\">" + settings.cursorChar + "</span>");
+            }
+
+            var mode = 4;
             var intervalCount = 0;
             var wordIndex = 0;
             var letterIndex = 0;
             var cursorCount = 0;
-            var stutterWrite = settings.stutter;
-            var stutterErase = settings.stutterErase;
-            var stutterProbability = settings.stutterProbability;
-            $(this).append("<span id=\"gtText\"></span>");
-            if (cursorShow) {
-                $(this).append("<span id=\"gtCursor\">" + settings.cursorChar + "</span>");
-            }
 
-            setInterval($.proxy(ghoster, this), settings.timeInterval);
+            setInterval($.proxy(ghoster, this), timeInterval);
 
             function ghoster() {
-                var inWord = $("#gtText").text();
+                var inWord = $("#gttext").text();
                 var currWord = keyWords[wordIndex];
                 var inWordLength = inWord.length;
-                var stutter = (stutterWrite && !(Math.random() < stutterProbability) || !stutterWrite);
-                var stutterOnClear = (stutterErase && !(Math.random() < stutterProbability) || !stutterErase);
+                var stutterProbOutcome, stutter = true, stutterOnClear = true;
+                if((stutterWrite && mode == 1) || (stutterErase && mode == 3)){
+                    stutterProbOutcome = !(Math.random() < stutterProbability);
+                    stutter = (stutterProbOutcome && stutterWrite);
+                    stutterOnClear = (stutterProbOutcome && stutterErase);
+                }
                 if (cursorShow) {
                     cursorCount++;
                     if (cursorCount == cursorInterval) {
-                        if ($("#gtCursor").is(":visible")) {
-                            $("#gtCursor").hide();
+                        if ($("#gtcursor").is(":visible") && ((mode != 1 && stutter)||(mode != 3 && stutterOnClear))) {
+                            $("#gtcursor").hide();
                         } else {
-                            $("#gtCursor").show();
+                            $("#gtcursor").show();
                         }
                         cursorCount = 0;
                     }
                 }
                 if (mode == 1 && stutter) {
                     letterIndex++;
-                    $("#gtText").text(currWord.substring(0, letterIndex));
+                    $("#gttext").text(currWord.substring(0, letterIndex));
                     if (letterIndex == currWord.length) {
                         mode++;
                         letterIndex = inWordLength + 1;
@@ -73,7 +78,7 @@
                 }
                 else if (mode == 3 && stutterOnClear) {
                     letterIndex--;
-                    $("#gtText").text(inWord.substring(0, letterIndex));
+                    $("#gttext").text(inWord.substring(0, letterIndex));
                     if (letterIndex == 0) {
                         mode++;
                     }
